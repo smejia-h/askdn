@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+	<script>
+		function numeroALetras(num) {
+			const unidades = ["", "UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
+			const especiales = ["DIEZ", "ONCE", "DOCE", "TRECE", "CATORCE", "QUINCE", "DIECISÉIS", "DIECISIETE", "DIECIOCHO", "DIECINUEVE"];
+			const decenas = ["", "DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
+			const centenas = ["", "CIENTO", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
+
+			function convertirMenosDeMil(n) {
+				if (n === 0) return "";
+				if (n < 10) return unidades[n];
+				if (n < 20) return especiales[n - 10];
+				if (n < 30) return (n === 20 ? "VEINTE" : "VEINTI" + unidades[n % 10]); // Manejo especial para 20-29
+				if (n < 100) return decenas[Math.floor(n / 10)] + (n % 10 !== 0 ? " Y " + unidades[n % 10] : "");
+				if (n === 100) return "CIEN";
+				return centenas[Math.floor(n / 100)] + (n % 100 !== 0 ? " " + convertirMenosDeMil(n % 100) : "");
+			}
+
+			function convertirMiles(n) {
+				if (n < 1000) return convertirMenosDeMil(n);
+				if (n < 1000000) {
+					const miles = Math.floor(n / 1000);
+					const resto = n % 1000;
+					return (miles === 1 ? "MIL" : convertirMenosDeMil(miles) + " MIL") + (resto !== 0 ? " " + convertirMenosDeMil(resto) : "");
+				}
+				return "Número fuera de rango";
+			}
+
+			// Convertir la parte entera
+			let entero = Math.floor(num);
+			let parteDecimal = Math.round((num - entero) * 100); // Extraer centavos
+			let parteEnteraEnLetras = convertirMiles(entero);
+
+			// Convertir la parte decimal
+			let parteDecimalEnLetras = "";
+			if (parteDecimal > 0) {
+				parteDecimalEnLetras = " CON " + convertirMenosDeMil(parteDecimal) + " CENTAVOS";
+			}
+
+			return parteEnteraEnLetras + " LEMPIRAS" + parteDecimalEnLetras;
+		}
+
+		window.onload = function () {
+			document.getElementById('CAI').innerHTML = document.getElementById('divCAI').innerHTML;
+			document.getElementById('Rango').innerHTML = document.getElementById('divRango').innerHTML;
+			document.getElementById('Fecha').innerHTML = document.getElementById('divFecha').innerHTML;
+			document.getElementById('RTN').innerHTML = document.getElementById('divRTN').innerHTML;
+			document.getElementById('nombreCli').innerHTML = document.getElementById('divNombreCli').innerHTML;
+		};	
+	</script>
+	<title>Document</title>
+	<style type="text/css">
+		body {
+			font-family: Monaco, monospace;
+			text-align: left;
+			color: #000;
+			margin-left: 2%;
+			margin-right: 2%;
+			padding: 0;
+			font-size: 22px
+		}
+
+		#divCAI {
+			display: none;
+		}
+
+		#divRango {
+			display: none;
+		}
+
+		#divFecha {
+			display: none;
+		}
+
+		#divRTN {
+			display: none;
+		}
+
+		#divNombreCli {
+			display: none;
+		}
+
+		.right {
+			text-align: right;
+		}
+
+		.left {
+			text-align: left;
+			padding: 0.2em 0.1em;
+		}
+
+		#doc_header {
+			margin-bottom: 10px;
+			border-bottom: 1px solid #000;
+			text-align: center;
+			font-size: 22px;
+		}
+
+		#store_name {
+			font-weight: bold;
+			font-size: 22px;
+		}
+
+		#client_info {
+			text-align: center;
+			font-size: 22px;
+		}
+
+		table#products {
+			width: 100%;
+			margin: 2em 0;
+			/*border-top: 2px dashed#000;*/
+			border-bottom: 2px dashed #000;
+			border-left: 0;
+			font-size: 22px;
+		}
+
+		th {
+			padding: 0.2em 0.1em;
+			border-bottom: 2px dashed #000;
+		}
+
+		.qty {
+			padding: 0.2em 0.5em;
+			text-align: center;
+		}
+
+		.price {
+			padding: 0.2em 0.1em;
+			text-align: right;
+		}
+
+		td {
+			padding: 0.2em 0.1em;
+			vertical-align: top;
+		}
+
+
+		tr.total td {
+			text-align: right;
+		}
+
+		#card_signature {
+			padding: 0em 3em;
+			text-align: left;
+		}
+
+		#sign_line {
+			margin-top: 1em;
+			border-bottom: 1px solid #000;
+			padding-bottom: 0.5em;
+		}
+
+		#doc_info {
+			text-align: center;
+			font-size: 22px;
+		}
+
+		#doc_info h4 {
+			padding: 0px 15px;
+			text-align: left;
+		}
+
+		#doc_info li {
+			text-align: left;
+		}
+
+		#store_footer {
+			border-top: 1px solid #000;
+			margin: 10px 0px;
+			text-align: center;
+		}
+
+		.unstyled {
+			padding: 0em;
+			list-style: none;
+		}
+
+		/* total discount------------------*/
+		tr.total_discount td {
+			padding: 3.5em 0;
+		}
+
+		/* TIP and Total Paid------------------*/
+		.clearfix {
+			zoom: 1;
+		}
+
+		.clearfix:before,
+		.clearfix:after {
+			display: table;
+			content: '';
+			line-height: 0;
+		}
+
+		.clearfix:after {
+			clear: both;
+		}
+
+		.container {
+			width: 100%;
+		}
+
+		.signature {
+			padding: 50%;
+			text-align: center;
+		}
+
+		.signature_agreement {
+			text-align: center;
+			font-weight: bold;
+		}
+
+		.col {
+			float: left;
+		}
+
+		.col.value {
+			border-bottom: 1px solid #000;
+			text-indent: -24px;
+		}
+
+		.col.val {
+			border-bottom: 0px;
+			text-align: right;
+		}
+
+		.col-2 {
+			width: 50%;
+			margin: 30px 0;
+		}
+
+		.col-3 {
+			width: 50%;
+			margin: 5px 0;
+		}
+
+		/*  Reciept title ------------------ */
+		.receipt_name {
+			text-align: center;
+			font-size: 22px;
+		}
+
+		.store-logo {
+			height: auto;
+			max-height: 100px;
+			max-width: 100%;
+		}
+
+		@viewport {
+			width: 420px;
+		}
+	</style>
+</head>
+
+<body style="font-size: 30;">
+	<div style="border-top:  solid 2px black;border-bottom: double 6px black;text-align:center ;font-size: 30;">&nbsp;
+	</div>
+
+	<div style=" text-align:center"><span style="font-size:28px;"><b>{{company_name}}</b><br />
+			<b>R.T.N.:05019003075958</b><br />
+			biproata@gmail.com<br />
+			<br />
+			<b>Casa Matriz</b><br />
+			{{company_address}}<br />
+			{{company_city}}<br />
+			<br />
+			<b>BIP GAS</b><br />
+			<br />
+			<b>Direcci&oacute;n Establecimiento</b></span></div>
+
+	<div style=" text-align:center"><span style="font-size:28px;">{{company_address}}<br />
+			{{company_city}}<br />
+			<br />
+			Tel:{{company_phone}} &nbsp;</span></div>
+
+	<p style="text-align: center;font-size:28px;"><span style="font-size:28px;">www.biproatan.com</span></p>
+
+	<div style="border:  solid 2px black; text-align:center; text-align: center;font-size:28px;"><span
+			style="font-size:28px;"><b>***SERVICO AL CIENTE***<br />
+				Tel. +504 9442-6739&nbsp;</b></span><span style="font-size:28px;"><b>/ +504 9435-2327<br />
+				TIGO Marca *574 </b></span></div>
+
+	<div class="receipt_name">
+		<div class="receipt_name"><span style="font-size:28px;"><b>C.A.I</b></span>
+
+			<div id="CAI" style="font-size:28px;">&nbsp;</div>
+			&nbsp;
+
+			<p><span style="font-size:28px;"><b>Rango Autorizado:</b></span></p>
+
+			<div id="Rango" style="font-size:28px;">&nbsp;</div>
+			<span style="font-size:28px;"><b>Fecha Limite Emisi&oacute;n:</b></span>
+
+			<div id="Fecha" style="font-size:28px;">&nbsp;</div>
+			<span style="font-size:28px;"> <b> </b><br />
+				<b>*****FACTURAS DE VENTA*****</b><br />
+				{{invoice_number}} </span><br />
+			&nbsp;
+			<div style="border-top: dashed 2px black;margin-bottom: 1px;">&nbsp;</div>
+
+			<div style="border-top: dashed 2px black;margin-top: 1px;">&nbsp;</div>
+
+			<div style="text-align: left;"><span style="font-size:28px;">Cliente:</span>
+
+				<div id="nombreCli" style="font-size:28px;">&nbsp;</div>
+				<span style="font-size:28px;">R.T.N.:</span>
+
+				<div id="RTN" style="font-size:28px;">&nbsp;</div>
+			</div>
+			&nbsp;
+
+			<div style="text-align: left;"><span style="font-size:28px;">Terminos:&nbsp;{{client_payterm}}</span><br />
+				<span style="font-size:28px;">Cajero: Administrador<br />
+					Fecha y Hora: {{invoice_date}}<br />
+					Motorista: {{sales_rep}}</span>
+			</div>
+
+			<div style="border-top: dashed 2px black;margin-bottom: 1px;">&nbsp;</div>
+
+			<div style="border-top: dashed 2px black;margin-top: 1px;">&nbsp;</div>
+
+			<div style="text-align: left;"><span style="font-size:28px;">====DATOS DEL ADQUIRIENTE EXONERADO====<br />
+					No. correlativo Orden de compra exenta:<br />
+					<br />
+					No. corretativo Constancia registro de Exonerados:<br />
+					<br />
+					No. Identificativo del registro de la SAG:</span></div>
+
+			<div style="border-top: dashed 2px black;margin-bottom: 1px;">&nbsp;</div>
+
+			<div style="border-top: dashed 2px black;margin-top: 1px;">
+				<table cellpadding="0" cellspacing="0" id="products">
+					<thead>
+						<tr>
+							<th class="left"><span style="font-size:28px;">Cant. Descripci&oacute;n</span></th>
+							<th class="left"><span style="font-size:28px;">Precio U.</span></th>
+							<th class="left"><span style="font-size:28px;">UNM</span></th>
+							<th class="price"><span style="font-size:28px;">TOTAL</span></th>
+						</tr>
+					</thead>
+					<tbody><!-- lines -->
+						<tr style="border-bottom: dashed 2px black;">
+							<td class="left"><span style="font-size:28px;">{{product_quantity}}&nbsp;
+									{{product_description}}</span></td>
+							<td class="left"><span style="font-size:28px;">{{product_price}}</span></td>
+							<td class="left"><span style="font-size:28px;">&nbsp;</span></td>
+							<td class="price"><span style="font-size:28px;">{{product_amount}}</span></td>
+						</tr>
+						<!-- ./lines -->
+						<tr class="total">
+						</tr>
+						<tr>
+							<td class="right" colspan="3"><span style="font-size:28px;"><b>Descuentos Y Rebajas
+										Otorgados:</b></span></td>
+							<td class="price"><span style="font-size:28px;">{{total_discount}}</span></td>
+						</tr>
+						<tr class="sub">
+							<td class="right" colspan="3"><span style="font-size:28px;">Subtotal Exento:</span></td>
+							<td class="price"><span style="font-size:28px;">{{subtotal}}</span></td>
+						</tr>
+						<tr class="sub">
+							<td class="right" colspan="3"><span style="font-size:28px;">Subtotal Exonerado:</span></td>
+							<td class="price"><span style="font-size:28px;">L 0.00</span></td>
+						</tr>
+						<tr class="total">
+							<td class="right" colspan="3"><span style="font-size:28px;">Subtotal ISV 15%:</span></td>
+							<td class="price"><span style="font-size:28px;">L 0.00</span></td>
+						</tr>
+						<tr class="total">
+							<td class="right" colspan="3"><span style="font-size:28px;">Subtotal ISV 18%:</span></td>
+							<td class="price"><span style="font-size:28px;">L 0.00</span></td>
+						</tr>
+						<tr class="total">
+							<td class="right" colspan="3"><span style="font-size:28px;">Subtotal:</span></td>
+							<td class="price" style="border-top: dashed 2px black;"><span
+									style="font-size:28px;">{{subtotal}}</span></td>
+						</tr>
+						<tr class="total">
+							<td class="right" colspan="3"><span style="font-size:28px;">ISV 18%:</span></td>
+							<td class="price" style="border-top: dashed 2px black;"><span style="font-size:28px;">L
+									0.00</span></td>
+						</tr>
+						<tr class="total">
+							<td class="right" colspan="3"><span style="font-size:28px;">ISV 18%:</span></td>
+							<td class="price"><span style="font-size:28px;">L 0.00</span></td>
+						</tr>
+						<tr class="total">
+							<td class="right" colspan="3"><span style="font-size:28px;"><b>TOTAL A PAGAR:</b> </span>
+							</td>
+							<td class="price" style="border-top: dashed 2px black;"><span id="TLetras"
+									style="font-size:28px;">{{total}}</span></td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="container">
+					<table>
+						<tbody>
+							<tr class="total">
+								<td class="left" colspan="3" style="text-align: left;"><span
+										style="font-size:28px;"><b>Total en Letras:</b></span></td>
+								<td class="price" id="totalLetras"
+									style="font-size:28px; border-top: 2px dashed black; font-weight: bold; text-align: left;">
+									<script>
+										//Se cambio el nombre de la variable total -> TotalL
+										TotalL = parseFloat(document.getElementById("TLetras").textContent.replace('L', '').replace(/,/g, '').trim());
+										document.write(numeroALetras(TotalL.toFixed(2)));
+									</script>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<!-- Se agrego el label para la tasa de cambio y monto en dolares -->
+
+					<p style="text-align: left;"><span style="font-size:28px;"><strong>Tasa:</strong></span> <span
+							id="TC" style="font-size:28px;">L25.49</span><br />
+						<span style="font-size:28px;"><strong>Total USD: </strong>$</span> <span
+							style="font-size:28px;">
+							<script>
+								TC = parseFloat(document.getElementById("TC").textContent.replace('L', '').replace(/,/g, '').trim());
+								TotalL = parseFloat(document.getElementById("TLetras").textContent.replace('L', '').replace(/,/g, '').trim());
+								TotalUSD = TotalL / TC;
+								document.write(TotalUSD.toFixed(2));
+							</script>
+						</span>
+					</p>
+
+					<p><span style="font-size:28px;"><strong>Precio LPG</strong><br />
+							Precio Base Planta (Con subsidio) L50.21<br />
+							Precio Base Cami&oacute;n L66.5</span></p>
+
+					<p><span style="font-size:28px;"><!-- Signature --> LA FACTURA ES BENEFICIO DE TODOS, EXIJALA!<br />
+							<strong>GRACIAS POR SU COMPRA</strong></span><br />
+						&nbsp;</p>
+
+					<p style="text-align: left;"><span style="font-size:28px;"><strong>ORIGINAL:</strong> Cliente<br />
+							<strong>COPIA:</strong> Obligado Tributario Emisor<br />
+							<strong>OBSERVACIONES:</strong> {{comments}}</span></p>
+
+					<p><br />
+						&nbsp;</p>
+
+					<div align="center"><span style="font-size:28px;">{{signature}}</span></div>
+
+					<div align="center" style="border-bottom: #000 solid 1px;margin-left:30%;margin-right:30%;"><span
+							style="font-size:28px;">&nbsp; </span></div>
+
+					<div id="divCAI" style="font-size:28px;">
+						<!-- sql query='select case when(select substr(mu.sales_grouo2,0,38) from cnf_mobile_users mu join _invoices_detail id on mu._id=id.mobile_user_id where id.invoice_id=@CURRENT_ORDER limit 1) is null 
+						then (select substr(mu.sales_grouo2,0,38) from cnf_mobile_users mu join invoices i on mu._id=i.mobile_user_id limit 1)
+						else (select substr(mu.sales_grouo2,0,38) from cnf_mobile_users mu join _invoices_detail id on mu._id=id.mobile_user_id where id.invoice_id=@CURRENT_ORDER limit 1) end as CAI;'-->
+					</div>
+
+					<div id="divRango" style="font-size:28px;">
+						<!-- sql query='SELECT transaction_prefix or cast(printf(@QUOTE%08d@QUOTE, transaction_number_init )as text) as number FROM module_transactions WHERE module_code = 205 ;' -->al
+						<!-- sql query='SELECT transaction_prefix or cast(printf(@QUOTE%08d@QUOTE, transaction_number_end )as text) as number FROM module_transactions WHERE module_code = 205 ;' -->
+					</div>
+
+					<div id="divFecha" style="font-size:28px;">
+						<!-- sql query='select cast(boureau  as text) from cnf_mobile_users mu join invoices id on mu._id=id.mobile_user_id where id._id=@CURRENT_ORDER limit 1;'-->
+					</div>
+
+					<div>
+						<div id="divRTN" style="font-size:28px;">
+							<!-- sql query='select client_nit as codecli  from invoices where _id=@CURRENT_ORDER;'-->
+							<div id="divNombreCli" style="font-size:28px;">
+								<!-- sql query='select client_branch_name as namecli  from invoices where _id=@CURRENT_ORDER;'-->
+								<div><span style="font-size:28px;">&nbsp;</span></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
